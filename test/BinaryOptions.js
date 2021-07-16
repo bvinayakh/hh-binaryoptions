@@ -12,12 +12,9 @@ describe("BinaryOptions", function () {
       "1626323473",
       "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e"
     );
-    const contractExpiry = await hardhatBinaryOptions.getContractExpiry();
-    console.log(contractExpiry.toNumber());
-
     describe("Deployment", function () {
       it("Validate BinaryOptions Owner", async function () {
-        expect(await BinaryOptions.getOwner()).to.eq(owner.address);
+        expect(await hardhatBinaryOptions.getOwner()).to.eq(owner.address);
       });
     });
   });

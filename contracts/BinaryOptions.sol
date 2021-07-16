@@ -5,6 +5,7 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "./Oracle.sol";
 
@@ -12,6 +13,10 @@ import "./Oracle.sol";
 //User can take any number of bids using DVD token
 //Payout proportion would be calculated based on the number of bids the user has placed
 contract BinaryOptions is Ownable, Pausable, Oracle {
+    using SafeMath for uint256;
+
+    bool admin;
+
     //total number of bids
     uint256 totalBids;
     //total number of short bids
@@ -27,8 +32,8 @@ contract BinaryOptions is Ownable, Pausable, Oracle {
     //price at expiry
     uint256 currentPrice;
 
-    mapping(address => uint256) longMap;
-    mapping(address => uint256) shortMap;
+    mapping(uint256 => address) longMap;
+    mapping(uint256 => address) shortMap;
     mapping(address => uint256) dvdBalance;
 
     //oracle price feed aggregator address
@@ -44,66 +49,89 @@ contract BinaryOptions is Ownable, Pausable, Oracle {
         uint256 _contractExpiryTime,
         uint256 _strikePrice,
         uint256 _bidPeriod,
-        address _aggregator
+        address _aggregator,
+        string memory _pair
     ) {
         contractExpiryTime = _contractExpiryTime;
         strikePrice = _strikePrice;
         bidPeriodTime = _bidPeriod;
         aggregator = _aggregator;
         dvdToken = _dvdToken;
+        emit contractDeployment(
+            _strikePrice,
+            _bidPeriod,
+            _contractExpiryTime,
+            _aggregator,
+            _pair
+        );
     }
 
     //all events
-    event eventLongBid(string);
-    event eventShortBid(string);
-    event eventReceiveFunds(string, address, uint256);
+    event eventBid(address biddingAddress, uint256 amount);
     event eventAnnounceResult(string);
     event eventPriceFeed(uint256);
+    event eventPaid(address payerAddress, uint256 amount);
+    //strikeprice, bidperiod, expiry, assetpair
+    event contractDeployment(
+        uint256 strikePrice,
+        uint256 bidPeriod,
+        uint256 expiry,
+        address oracleAggregatorAddress,
+        string assetPair
+    );
 
-    function bidLong(uint256 bids) public payable whenNotPaused {
+    function bidLong(address _address, uint256 _bids) public whenNotPaused {
         //if current time is lesser than the bidding time limit then allow voting
         require(block.timestamp < bidPeriodTime, "Bidding Period has ended");
         // dvdToken.transferFrom(msg.sender, address(this), 1);
-        require(bids >= 1, "Place a minimum of 1 bid");
-        totalBids++;
-        // lets assume every vote is 1000 wei
-        // longMap[participant] = bids;
-        longMap[msg.sender] = bids;
+        require(_bids >= 1, "Place a minimum of 1 bid");
+        dvdToken.transferFrom(_address, address(this), _bids);
+        dvdBalance[_address] = _bids;
         longBid++;
-        emit eventReceiveFunds("bid long called", msg.sender, msg.value);
-        emit eventLongBid("Long Bid Invoked");
+        totalBids++;
+        longMap[longBid] = _address;
+        emit eventBid(_address, _bids);
     }
 
-    function bidShort(uint256 bids) public payable whenNotPaused {
+    function bidShort(address _address, uint256 _bids) public whenNotPaused {
         //if current time is lesser than the bidding time limit then allow voting
         require(block.timestamp < bidPeriodTime, "Bidding Period has ended");
         // dvdToken.transferFrom(msg.sender, address(this), 1);
-        require(bids >= 1, "Place a minimum of 1 bid");
-        totalBids++;
-        // assume every vote is 1000 wei
-        // shortMap[participant] = bids;
-        shortMap[msg.sender] = bids;
+        require(_bids >= 1, "Place a minimum of 1 bid");
+        dvdToken.transferFrom(_address, address(this), _bids);
+        dvdBalance[_address] = _bids;
         shortBid++;
-        emit eventReceiveFunds("bid short called", msg.sender, msg.value);
-        emit eventShortBid("Short Bid Invoked");
+        totalBids++;
+        shortMap[shortBid] = _address;
+        emit eventBid(_address, _bids);
     }
 
     /**Invoke price feed oracle and get price. Compare strike price and with value from price feed.
     if current time is more than the end time specified during contract creation then allow announce result*/
     function announceResult() public onlyOwner whenNotPaused {
-        require(block.timestamp >= contractExpiryTime, "Option Not Expired");
+        require(
+            block.timestamp >= contractExpiryTime || admin,
+            "Option Not Expired"
+        );
         currentPrice = uint256(getPrice(aggregator));
         emit eventPriceFeed(currentPrice);
         if (currentPrice > strikePrice) {
-            //positive won
-            // amountperwinner = address(this).balance/positiveCount;
+            //long
             emit eventAnnounceResult("Positive Options Bid Win");
-            // enable withdrawals based on number of tickets
+            // uint256 unit = totalBids / longBid;
+            for (uint256 i = 0; i < longBid; i++) {
+                address winner = longMap[i];
+                // approve dvdtoken withdrawals based on number of tickets
+                dvdToken.approve(winner, dvdBalance[winner]);
+            }
         } else {
-            //negative won
-            // amountperwinner = address(this).balance/negativeCount;
+            //short
             emit eventAnnounceResult("Negative Options Bid Win");
-            // enable withdrawals based on number of tickets
+            for (uint256 i = 0; i < shortBid; i++) {
+                address winner = shortMap[i];
+                // approve dvdtoken withdrawals based on number of tickets
+                dvdToken.approve(winner, dvdBalance[winner]);
+            }
         }
     }
 
@@ -140,15 +168,38 @@ contract BinaryOptions is Ownable, Pausable, Oracle {
     }
 
     function getDVDBalance(address _address) external view returns (uint256) {
-        return dvdBalance[_address];
+        return dvdToken.balanceOf(_address);
+    }
+
+    function getContractDVDBalance() external view returns (uint256) {
+        return dvdToken.balanceOf(address(this));
     }
 
     function getOwner() external view returns (address) {
         return owner();
     }
 
+    function transferDVD(address _from, uint256 _amount) external {
+        dvdToken.transferFrom(_from, address(this), _amount);
+    }
+
+    function setPause(bool pause) public onlyOwner {
+        if (pause) {
+            _pause();
+        } else {
+            _unpause();
+        }
+    }
+
+    function setAdmin(bool value) public onlyOwner {
+        admin = value;
+    }
+
+    function isPaused() external view returns (bool) {
+        return paused();
+    }
+
     receive() external payable {
-        dvdBalance[msg.sender] = msg.value;
-        emit eventReceiveFunds("receive fnction called", msg.sender, msg.value);
+        emit eventPaid(msg.sender, msg.value);
     }
 }

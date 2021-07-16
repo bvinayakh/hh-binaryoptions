@@ -1,5 +1,4 @@
 const hre = require("hardhat");
-const { ethers } = require("ethers");
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
@@ -7,10 +6,11 @@ async function main() {
   const BinaryOptions = await hre.ethers.getContractFactory("BinaryOptions");
   const hardhatBinaryOptions = await BinaryOptions.deploy(
     "0xC73b99833423630C087D0C50C1372db23360bE69",
-    "1627187473",
-    "3000",
-    "1626323473",
-    "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e"
+    "1629120641",
+    "400",
+    "1628601959",
+    "0xcf0f51ca2cDAecb464eeE4227f5295F2384F84ED",
+    "bnb/usd"
   );
 
   console.log("BinaryOptions address:", hardhatBinaryOptions.address);

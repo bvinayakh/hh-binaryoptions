@@ -2,11 +2,9 @@
 
 pragma solidity >=0.4.22 <0.9.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@chainlink/contracts/src/v0.8/dev/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
-contract Oracle is ChainlinkClient {
+contract Oracle {
     AggregatorV3Interface internal priceFeed;
 
     // constructor() public {
@@ -24,6 +22,7 @@ contract Oracle is ChainlinkClient {
             uint256 timeStamp,
             uint80 answeredInRound
         ) = priceFeed.latestRoundData();
+        require(timeStamp > 0, "Round not complete");
         return price;
     }
 }

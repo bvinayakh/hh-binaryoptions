@@ -19,6 +19,7 @@
   "homepage": "https://github.com/svinayak8k/hh-binaryoptions#readme",
   "dependencies": {
     "@chainlink/contracts": "^0.2.0",
+    "@nomiclabs/hardhat-ganache": "^2.0.0",
     "@openzeppelin/contracts": "^4.2.0",
     "hardhat": "^2.4.1"
   },
