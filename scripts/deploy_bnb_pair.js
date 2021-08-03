@@ -5,10 +5,10 @@ async function main() {
   console.log("Deploying contract with the account:", deployer.address);
   const BinaryOptions = await hre.ethers.getContractFactory("BinaryOptions");
   const hardhatBinaryOptions = await BinaryOptions.deploy(
-    "0xC73b99833423630C087D0C50C1372db23360bE69",
-    "1629120641",
-    "400",
-    "1628601959",
+    "0xefBa2d2a4fdAc112E47152f48D0Dee90E26A9E3C",
+    "1629497482",
+    "200",
+    "1629497482",
     "0xcf0f51ca2cDAecb464eeE4227f5295F2384F84ED",
     "bnb/usd"
   );

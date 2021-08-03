@@ -6,7 +6,10 @@ const {
   projectId,
   etherscan,
   aprojectId,
-  privatekey,
+  privatekey_0x0CcA67351d8384800836B937Ad61C4Ac853b744C,
+  privatekey_0xa24d23355Bc1435B8590368500a68C63566D174A,
+  privatekey_0x48644e352c7b8df27008e0523af97AA971ee6E2D,
+  privatekey_0xfb7246b3A7094a682edb80ee157A27a5CA0Fb18F,
   ganache_mnemonic,
   ganache_privatekey,
 } = require("./secrets.json");
@@ -30,9 +33,21 @@ module.exports = {
   solidity: "0.8.4",
   defaultNetwork: "ganache",
   networks: {
-    rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/" + aprojectId,
-      accounts: ["0x" + privatekey],
+    rinkeby_0x0CcA67351d8384800836B937Ad61C4Ac853b744C: {
+      url: "https://rinkeby.infura.io/v3/" + projectId,
+      accounts: ["0x" + privatekey_0x0CcA67351d8384800836B937Ad61C4Ac853b744C],
+    },
+    rinkeby_0xa24d23355Bc1435B8590368500a68C63566D174A: {
+      url: "https://rinkeby.infura.io/v3/" + projectId,
+      accounts: ["0x" + privatekey_0xa24d23355Bc1435B8590368500a68C63566D174A],
+    },
+    rinkeby_0x48644e352c7b8df27008e0523af97AA971ee6E2D: {
+      url: "https://rinkeby.infura.io/v3/" + projectId,
+      accounts: ["0x" + privatekey_0x48644e352c7b8df27008e0523af97AA971ee6E2D],
+    },
+    rinkeby_0xfb7246b3A7094a682edb80ee157A27a5CA0Fb18F: {
+      url: "https://rinkeby.infura.io/v3/" + projectId,
+      accounts: ["0x" + privatekey_0xfb7246b3A7094a682edb80ee157A27a5CA0Fb18F],
     },
     ganache: {
       url: "http://127.0.0.1:8545",

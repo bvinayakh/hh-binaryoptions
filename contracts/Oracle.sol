@@ -13,7 +13,7 @@ contract Oracle {
     //     );
     // }
 
-    function getPrice(address aggregator) public returns (int256) {
+    function getPrice(address aggregator) public returns (uint256) {
         priceFeed = AggregatorV3Interface(aggregator);
         (
             uint80 roundID,
@@ -23,6 +23,7 @@ contract Oracle {
             uint80 answeredInRound
         ) = priceFeed.latestRoundData();
         require(timeStamp > 0, "Round not complete");
-        return price;
+        uint8 decimals = priceFeed.decimals();
+        return uint256(price) / uint256(10**decimals);
     }
 }
