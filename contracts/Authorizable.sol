@@ -5,7 +5,7 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Authorizable is Ownable {
-    mapping(address => bool) public authorized;
+    mapping(address => bool) internal authorized;
 
     modifier onlyAuthorized() {
         require(

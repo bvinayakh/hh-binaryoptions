@@ -1,5 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
+require("@nomiclabs/hardhat-ganache");
+require("@openzeppelin/hardhat-upgrades");
 
 const {
   metamask_mnemonic,
@@ -50,9 +52,14 @@ module.exports = {
       accounts: ["0x" + privatekey_0xfb7246b3A7094a682edb80ee157A27a5CA0Fb18F],
     },
     ganache: {
-      url: "http://127.0.0.1:8545",
+      url: "http://127.0.0.1:7545",
+      accounts: [
+        "0x" +
+          "9e7bd1a631bf9926ac17e4f5bbe6f17cbf258c06aa6fbf4e368262ca551527bf",
+      ],
       gasLimit: 6000000000,
-      defaultBalanceEther: 10,
+      from: "0x09a2D6758DFf4eaBeFF2E8bdcD954F42129072B7",
+      // defaultBalanceEther: 10,
     },
     hardhat: {
       forking: {

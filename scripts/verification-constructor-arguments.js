@@ -1,8 +1,8 @@
 module.exports = [
-  "0xefBa2d2a4fdAc112E47152f48D0Dee90E26A9E3C",
-  "1629497482",
-  "3000",
-  "1629497482",
-  "0x8A753747A1Fa494EC906cE90E9f37563A8AF630e",
-  "eth/usd",
+  "0xfdd972446c5bcf4c3c65817462de1a0b70764eeb",
+  "1635613200",
+  "150",
+  "1635613200",
+  "0xcf0f51ca2cDAecb464eeE4227f5295F2384F84ED",
+  "bnb/usd",
 ];
