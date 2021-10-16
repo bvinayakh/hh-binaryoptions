@@ -4,7 +4,7 @@ require("@nomiclabs/hardhat-ganache");
 require("@openzeppelin/hardhat-upgrades");
 
 const {
-  metamask_mnemonic,
+  testnet,
   projectId,
   etherscan,
   aprojectId,
@@ -60,6 +60,12 @@ module.exports = {
       gasLimit: 6000000000,
       from: "0x09a2D6758DFf4eaBeFF2E8bdcD954F42129072B7",
       // defaultBalanceEther: 10,
+    },
+    testnet: {
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      chainId: 97,
+      gasPrice: 20000000000,
+      accounts: ["0x" + testnet],
     },
     hardhat: {
       forking: {

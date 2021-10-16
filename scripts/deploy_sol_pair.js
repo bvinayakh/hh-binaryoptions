@@ -7,10 +7,10 @@ async function main() {
   const hardhatBinaryOptions = await BinaryOptions.deploy(
     "0xfdd972446c5bcf4c3c65817462de1a0b70764eeb",
     "1635613200",
-    "52000",
+    "170",
     "1635613200",
-    "0xECe365B379E1dD183B20fc5f022230C044d51404",
-    "btc/usd"
+    "0x4ffC43a60e009B551865A93d232E33Fce9f01507",
+    "sol/usd"
   );
 
   console.log("BinaryOptions address:", hardhatBinaryOptions.address);
